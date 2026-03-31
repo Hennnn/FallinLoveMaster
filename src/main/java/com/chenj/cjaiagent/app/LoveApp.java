@@ -1,5 +1,7 @@
 package com.chenj.cjaiagent.app;
 
+import com.alibaba.cloud.ai.dashscope.api.DashScopeApi;
+import com.alibaba.cloud.ai.dashscope.rag.DashScopeDocumentRetriever;
 import com.alibaba.cloud.ai.dashscope.rag.DashScopeDocumentRetrieverOptions;
 import com.chenj.cjaiagent.advisor.MyLoggerAdvisor;
 import com.chenj.cjaiagent.chatmemory.FileBasedChatMemory;
@@ -15,6 +17,7 @@ import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.rag.advisor.RetrievalAugmentationAdvisor;
 import org.springframework.ai.rag.retrieval.search.DocumentRetriever;
 import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 
@@ -97,22 +100,24 @@ public class LoveApp {
     }
 
     /**
-     * 和 AI知识库进行对话
+     * 和 AI知识库进行对话 (知识库：本地/云平台）
      */
     @Resource
     private VectorStore loveAppVectorStore;
-//    @Resource
-//    private Advisor loveAppRagCloudAdvisor;
+    @Resource
+    private Advisor loveAppRagCloudAdvisor;
+    @Resource
+    private VectorStore pgVectorVectorStore;
 
     public String doChatWithRag(String message, String conversationId) {
+
         ChatResponse chatResponse = chatClient
                 .prompt()
                 .user(message)
-                .advisors(new MyLoggerAdvisor())
-                .advisors(QuestionAnswerAdvisor.builder(loveAppVectorStore).build()) //QuestionAnswerAdvisor比较适用于单个测试 RetrievalAugmentationAdvisor适用于批量
-//                .advisors(RetrievalAugmentationAdvisor.builder()
-//                        .documentRetriever((DocumentRetriever) DashScopeDocumentRetrieverOptions.builder().indexName("情感大师").build())
-//                        .build()) //利用RAG 检索增强服务 (基于云知识库）
+//                .advisors(new MyLoggerAdvisor())
+//                .advisors(QuestionAnswerAdvisor.builder(loveAppVectorStore).build()) //QuestionAnswerAdvisor比较适用于单个测试 RetrievalAugmentationAdvisor适用于批量
+//                .advisors(loveAppRagCloudAdvisor)//利用RAG 检索增强服务 (基于云知识库）
+                .advisors(QuestionAnswerAdvisor.builder(pgVectorVectorStore).build())//利用RAG 检索增强服务 (基于PGVector向量存储）
                 .call()
                 .chatResponse();
         String content = chatResponse.getResult().getOutput().getText();

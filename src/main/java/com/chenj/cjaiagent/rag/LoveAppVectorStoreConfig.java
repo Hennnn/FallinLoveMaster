@@ -26,6 +26,5 @@ public class LoveAppVectorStoreConfig {
         List<Document> documentList = loveAppDocumentLoader.loadMarkdowns();
         simpleVectorStore.doAdd(documentList);
         return simpleVectorStore;
-
     }
 }

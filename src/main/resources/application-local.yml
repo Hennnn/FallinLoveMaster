@@ -7,3 +7,18 @@ spring:
       chat:
         options:
           model: qwen-plus
+          bailen-knowledge-base-id: v2z32g9201
+        rag:
+          index-name: 情感大师
+          enabled: true
+    vectorstore:
+      pgvector:
+        index-type: HNSW
+        dimensions: 1536
+        distance-type: COSINE_DISTANCE
+        max-document-batch-size: 10000
+
+  datasource:
+    url: jdbc:postgresql://rm-cn-c384pyl5t0001igo.rwlb.rds.aliyuncs.com:5432/cj_ai_agent
+    username: my_user
+    password: CJcj2020
