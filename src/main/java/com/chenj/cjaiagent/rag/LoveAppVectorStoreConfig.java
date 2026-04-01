@@ -19,12 +19,17 @@ public class LoveAppVectorStoreConfig {
 
     @Resource
     private LoveAppDocumentLoader loveAppDocumentLoader;
+    @Resource
+    private MyKeywordEnricher myKeywordEnricher;
 
     @Bean
     VectorStore loveAppVectorStore(EmbeddingModel dashscopeEmbeddingModel){
         SimpleVectorStore simpleVectorStore = SimpleVectorStore.builder(dashscopeEmbeddingModel).build();
+        //加载文档
         List<Document> documentList = loveAppDocumentLoader.loadMarkdowns();
-        simpleVectorStore.doAdd(documentList);
+        //元信息增强器:自动为文档补充元信息
+        List<Document> enrichDocument = myKeywordEnricher.enrichDocument(documentList);
+        simpleVectorStore.doAdd(enrichDocument);
         return simpleVectorStore;
     }
 }

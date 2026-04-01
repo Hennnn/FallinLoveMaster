@@ -32,7 +32,7 @@ public class PgVectorVectorStoreConfig {
                 .initializeSchema(true)
                 .schemaName("public")  //表名
                 .vectorTableName("vector_store")  //数据库名
-                .maxDocumentBatchSize(50)  //单次最大插入
+                .maxDocumentBatchSize(50)  //单次最大插入可自定义实现
                 .build();
         // 2. 加载所有文档
         List<Document> allDocuments = loveAppDocumentLoader.loadMarkdowns();

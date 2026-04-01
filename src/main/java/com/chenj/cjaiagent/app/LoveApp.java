@@ -5,6 +5,8 @@ import com.alibaba.cloud.ai.dashscope.rag.DashScopeDocumentRetriever;
 import com.alibaba.cloud.ai.dashscope.rag.DashScopeDocumentRetrieverOptions;
 import com.chenj.cjaiagent.advisor.MyLoggerAdvisor;
 import com.chenj.cjaiagent.chatmemory.FileBasedChatMemory;
+import com.chenj.cjaiagent.rag.LoveAppRagCustomAdvisorFactory;
+import com.chenj.cjaiagent.rag.QueryRewrite;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
@@ -14,6 +16,7 @@ import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.rag.Query;
 import org.springframework.ai.rag.advisor.RetrievalAugmentationAdvisor;
 import org.springframework.ai.rag.retrieval.search.DocumentRetriever;
 import org.springframework.ai.vectorstore.VectorStore;
@@ -108,16 +111,26 @@ public class LoveApp {
     private Advisor loveAppRagCloudAdvisor;
     @Resource
     private VectorStore pgVectorVectorStore;
+    @Resource
+    private QueryRewrite queryRewrite;
 
     public String doChatWithRag(String message, String conversationId) {
+        //将用户提示词进行重写
+        String rewriteMessage = queryRewrite.doQueryRewrite(message);
 
         ChatResponse chatResponse = chatClient
                 .prompt()
-                .user(message)
-//                .advisors(new MyLoggerAdvisor())
-//                .advisors(QuestionAnswerAdvisor.builder(loveAppVectorStore).build()) //QuestionAnswerAdvisor比较适用于单个测试 RetrievalAugmentationAdvisor适用于批量
-//                .advisors(loveAppRagCloudAdvisor)//利用RAG 检索增强服务 (基于云知识库）
-                .advisors(QuestionAnswerAdvisor.builder(pgVectorVectorStore).build())//利用RAG 检索增强服务 (基于PGVector向量存储）
+//                .user(message) //原始用户输入提示词
+                .user(rewriteMessage)//使用改写后的提示词
+                .advisors(advisorSpec -> advisorSpec.param(ChatMemory.CONVERSATION_ID,conversationId)) //设置拦截器参数
+                .advisors(new MyLoggerAdvisor())
+
+                .advisors(QuestionAnswerAdvisor.builder(loveAppVectorStore).build()) //QuestionAnswerAdvisor比较适用于单个测试 RetrievalAugmentationAdvisor适用于批量
+//                .advisors(loveAppRagCloudAdvisor)//利用RAG 检索增强服务 (基于云知识库服务）
+//                .advisors(QuestionAnswerAdvisor.builder(pgVectorVectorStore).build())//利用RAG 检索增强服务 (基于PGVector向量存储）
+
+//                .advisors(LoveAppRagCustomAdvisorFactory.create(loveAppVectorStore,"单身"))//自定义RAG检索增强的顾问去服务（文档查询器+上下文增强器）
+
                 .call()
                 .chatResponse();
         String content = chatResponse.getResult().getOutput().getText();

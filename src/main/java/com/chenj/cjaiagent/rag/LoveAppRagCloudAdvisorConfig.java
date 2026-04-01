@@ -45,8 +45,8 @@ public class LoveAppRagCloudAdvisorConfig {
 
             log.info("已初始化基于百炼知识库 ({}) 的 RAG 顾问", knowledgeBaseName);
 
-            return RetrievalAugmentationAdvisor.builder()
-                    .documentRetriever(documentRetriever)
+            return RetrievalAugmentationAdvisor.builder() //还可以设置查询前用 文档重写器 .queryTransformers(RewriteQueryTransformer.builder()
+                    .documentRetriever(documentRetriever) //查询过程中用 文档加载器
                     .build();
         } catch (Exception e) {
             log.error("初始化百炼 RAG 顾问失败", e);
