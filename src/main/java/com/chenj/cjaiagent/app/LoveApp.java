@@ -19,6 +19,9 @@ import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.rag.Query;
 import org.springframework.ai.rag.advisor.RetrievalAugmentationAdvisor;
 import org.springframework.ai.rag.retrieval.search.DocumentRetriever;
+import org.springframework.ai.support.ToolCallbacks;
+import org.springframework.ai.tool.ToolCallback;
+import org.springframework.ai.tool.method.MethodToolCallback;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -131,6 +134,30 @@ public class LoveApp {
 
 //                .advisors(LoveAppRagCustomAdvisorFactory.create(loveAppVectorStore,"单身"))//自定义RAG检索增强的顾问去服务（文档查询器+上下文增强器）
 
+                .call()
+                .chatResponse();
+        String content = chatResponse.getResult().getOutput().getText();
+        log.info("content: {}", content);
+        return content;
+    }
+
+
+    @Resource
+    private ToolCallback[] allTools;
+
+    /**
+     * AI调用工具功能
+     * @param message
+     * @param conversationId
+     * @return
+     */
+    public String doChatWithTools(String message, String conversationId) {
+        ChatResponse chatResponse = chatClient
+                .prompt()
+                .user(message)
+                .advisors(advisorSpec -> advisorSpec.param(ChatMemory.CONVERSATION_ID,conversationId)) //设置拦截器参数
+                .advisors(new MyLoggerAdvisor()) //开启日志  便于观察效果
+                .toolCallbacks(allTools)
                 .call()
                 .chatResponse();
         String content = chatResponse.getResult().getOutput().getText();

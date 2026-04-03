@@ -22,3 +22,6 @@ spring:
     url: jdbc:postgresql://rm-cn-c384pyl5t0001igo.rwlb.rds.aliyuncs.com:5432/cj_ai_agent
     username: my_user
     password: CJcj2020
+#search API
+search-api:
+  api-key: 5SinAe2iVySZJJxt3tumUbnc

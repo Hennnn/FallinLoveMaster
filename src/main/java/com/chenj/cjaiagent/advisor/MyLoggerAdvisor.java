@@ -49,8 +49,9 @@ public class MyLoggerAdvisor implements CallAdvisor, StreamAdvisor {
         return new ChatClientMessageAggregator().aggregateChatClientResponse(chatClientResponses, this::logResponse);//因为采用流式响应，所以用个聚合器来处理
     }
 
-    private void logRequest(ChatClientRequest request) {
-        log.info("AI Request:{}",request.prompt().getUserMessage().getText()); //自定义打印调用前的usermessage文本
+    private ChatClientRequest logRequest(ChatClientRequest request) {
+        log.info("AI Request:{}",request.prompt().getUserMessage().getText()); //自定义打印调用前的usermessage文本==.userText()？
+        return request;
     }
 
     private void logResponse(ChatClientResponse chatClientResponse) {
