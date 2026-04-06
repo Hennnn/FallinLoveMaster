@@ -19,28 +19,6 @@
     <properties>
         <java.version>21</java.version>
     </properties>
-<!--&lt;!&ndash;统一管理 spring ai 版本 &ndash;&gt;-->
-<!--    <dependencyManagement>-->
-<!--        <dependencies>-->
-<!--            &lt;!&ndash; 1. 统一 Spring AI 所有模块版本（强制对齐 1.0.0 GA） &ndash;&gt;-->
-<!--            <dependency>-->
-<!--                <groupId>org.springframework.ai</groupId>-->
-<!--                <artifactId>spring-ai-bom</artifactId>-->
-<!--                <version>1.0.0</version>-->
-<!--                <type>pom</type>-->
-<!--                <scope>import</scope>-->
-<!--            </dependency>-->
-<!--            &lt;!&ndash; 2. 锁定 Jackson 2.18.x，彻底拦截 3.x 或旧版冲突 &ndash;&gt;-->
-<!--            <dependency>-->
-<!--                <groupId>com.fasterxml.jackson</groupId>-->
-<!--                <artifactId>jackson-bom</artifactId>-->
-<!--                <version>2.18.2</version>-->
-<!--                <type>pom</type>-->
-<!--                <scope>import</scope>-->
-<!--            </dependency>-->
-<!--        </dependencies>-->
-<!--    </dependencyManagement>-->
-
 
     <dependencies>
         <!-- 工具库 -->
@@ -142,24 +120,6 @@
             <version>9.1.0</version>
             <scope>test</scope>
         </dependency>
-<!--        &lt;!&ndash; Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-mcp &ndash;&gt;-->
-<!--        <dependency>-->
-<!--            <groupId>org.springframework.ai</groupId>-->
-<!--            <artifactId>spring-ai-mcp</artifactId>-->
-<!--            <version>1.1.2</version>-->
-<!--            <scope>compile</scope>-->
-<!--        </dependency>-->
-        <!-- Spring AI MCP Client -->
-        <!-- Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-mcp-client -->
-        <dependency>
-            <groupId>org.springframework.ai</groupId>
-            <artifactId>spring-ai-starter-mcp-client</artifactId>
-            <version>1.1.2</version>
-            <scope>compile</scope>
-        </dependency>
-
-
-
 
 
         <!--用LangChain4j 调用 Alibaba DashScope -->
