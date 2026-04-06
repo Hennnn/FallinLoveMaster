@@ -12,7 +12,7 @@ import org.springframework.ai.tool.annotation.ToolParam;
 public class FileOperationTool {
     private final String FILE_DIR = FileConstant.FILE_SAVE_DIR + "/file";
 
-    @Tool(description = "Read content from a file")
+    @Tool(description = "Read content from a file" ,returnDirect = false)
     public String readFile(@ToolParam(description = "Name of a file to read") String fileName){  //返回String因为结果还要作为上下文拼接传给ai，不定义这种也许但是还要ai框架多做这一步
         String filePath = FILE_DIR + "/" + fileName;
         try{

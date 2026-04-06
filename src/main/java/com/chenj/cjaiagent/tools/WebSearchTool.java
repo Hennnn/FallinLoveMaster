@@ -48,6 +48,4 @@ public class WebSearchTool {
             return "Error searching Baidu: " + e.getMessage();
         }
     }
-
-
 }

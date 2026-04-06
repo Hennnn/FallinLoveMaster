@@ -21,6 +21,7 @@ import org.springframework.ai.rag.advisor.RetrievalAugmentationAdvisor;
 import org.springframework.ai.rag.retrieval.search.DocumentRetriever;
 import org.springframework.ai.support.ToolCallbacks;
 import org.springframework.ai.tool.ToolCallback;
+import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.ai.tool.method.MethodToolCallback;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Value;
@@ -158,6 +159,28 @@ public class LoveApp {
                 .advisors(advisorSpec -> advisorSpec.param(ChatMemory.CONVERSATION_ID,conversationId)) //设置拦截器参数
                 .advisors(new MyLoggerAdvisor()) //开启日志  便于观察效果
                 .toolCallbacks(allTools)
+                .call()
+                .chatResponse();
+        String content = chatResponse.getResult().getOutput().getText();
+        log.info("content: {}", content);
+        return content;
+    }
+
+    @Resource
+    private ToolCallbackProvider toolCallbackProvider; //启动时springAI自动将第三方工具封装成一个toolCallbackProvider对象
+    /**
+     * AI调用工具功能(使用 MCP 服务）
+     * @param message
+     * @param conversationId
+     * @return
+     */
+    public String doChatWithMcp(String message, String conversationId) {
+        ChatResponse chatResponse = chatClient
+                .prompt()
+                .user(message)
+                .advisors(advisorSpec -> advisorSpec.param(ChatMemory.CONVERSATION_ID,conversationId)) //设置拦截器参数
+                .advisors(new MyLoggerAdvisor()) //开启日志  便于观察效果
+                .toolCallbacks(toolCallbackProvider) //用法跟自己定义工具集是一样的
                 .call()
                 .chatResponse();
         String content = chatResponse.getResult().getOutput().getText();
