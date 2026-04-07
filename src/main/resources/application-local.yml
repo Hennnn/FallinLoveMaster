@@ -17,6 +17,17 @@ spring:
         dimensions: 1536
         distance-type: COSINE_DISTANCE
         max-document-batch-size: 10000
+    mcp:
+      client:
+        enabled: true
+        request-timeout: 30s
+        stdio: #JSON目前仅支持stdio这种连接方式
+          servers-configuration: classpath:mcp-servers.json #stdio本地服务端配置
+      #实现远程连接
+#      sse:
+#        connections:
+#          server1:
+#            url: http://localhost:8127
 
   datasource:
     url: jdbc:postgresql://rm-cn-c384pyl5t0001igo.rwlb.rds.aliyuncs.com:5432/cj_ai_agent

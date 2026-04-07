@@ -101,6 +101,21 @@
 <!--            <artifactId>spring-ai-starter-vector-store-pgvector</artifactId>-->
 <!--            <version>2.0.0-M3</version>-->
 <!--        </dependency>-->
+
+        <!-- MCP  -->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-mcp-server-spring-boot-starter</artifactId>-->
+<!--            <version>1.0.0-M6</version>-->
+<!--        </dependency>-->
+
+        <!-- 我们（客户端）需要引入别人（如高德）服务端的工具调用，所有需要一个mcp client的依赖 -->
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-mcp-client-spring-boot-starter</artifactId>
+            <version>1.0.0-M6</version>
+        </dependency>
+
         <!-- jsoup html 网页抓取解析库-->
         <dependency>
             <groupId>org.jsoup</groupId>

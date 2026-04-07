@@ -1,11 +1,7 @@
 package com.chenj.cjaiagent.app;
 
-import com.alibaba.cloud.ai.dashscope.api.DashScopeApi;
-import com.alibaba.cloud.ai.dashscope.rag.DashScopeDocumentRetriever;
-import com.alibaba.cloud.ai.dashscope.rag.DashScopeDocumentRetrieverOptions;
 import com.chenj.cjaiagent.advisor.MyLoggerAdvisor;
 import com.chenj.cjaiagent.chatmemory.FileBasedChatMemory;
-import com.chenj.cjaiagent.rag.LoveAppRagCustomAdvisorFactory;
 import com.chenj.cjaiagent.rag.QueryRewrite;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -16,14 +12,9 @@ import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
-import org.springframework.ai.rag.Query;
-import org.springframework.ai.rag.advisor.RetrievalAugmentationAdvisor;
-import org.springframework.ai.rag.retrieval.search.DocumentRetriever;
-import org.springframework.ai.support.ToolCallbacks;
 import org.springframework.ai.tool.ToolCallback;
-import org.springframework.ai.tool.method.MethodToolCallback;
+import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.ai.vectorstore.VectorStore;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 
@@ -43,6 +34,7 @@ public class LoveApp {
 
     /**
      * 初始化AI客户端
+     *
      * @param dashscopeChatModel
      */
     public LoveApp(ChatModel dashscopeChatModel) {  //传入自带大模型
@@ -63,7 +55,8 @@ public class LoveApp {
 
     /**
      * AI 基础对话（支持多轮对话记忆）
-     * @param message 用户消息
+     *
+     * @param message        用户消息
      * @param conversationId 会话ID（用于区分不同用户的对话）
      * @return AI 回复内容
      */
@@ -71,7 +64,7 @@ public class LoveApp {
         ChatResponse chatResponse = chatClient
                 .prompt()
                 .user(message)
-                .advisors(advisorSpec -> advisorSpec.param(ChatMemory.CONVERSATION_ID,conversationId)) //设置拦截器参数
+                .advisors(advisorSpec -> advisorSpec.param(ChatMemory.CONVERSATION_ID, conversationId)) //设置拦截器参数
                 .call()
 //                .entity(User.class)
 //                .chatResponse().getResult().getOutput().getText() 等价于下一行 也可以用.entity()来指定输出的格式如上一行所示
@@ -82,12 +75,13 @@ public class LoveApp {
     }
 
 
-    record LoveReport(String title, List<String> suggetions){
+    record LoveReport(String title, List<String> suggetions) {
 
     }
 
     /**
      * AI恋爱报告功能  （支持结构化输出的对话 ）
+     *
      * @param message
      * @param conversationId
      * @return
@@ -97,7 +91,7 @@ public class LoveApp {
                 .prompt()
                 .system(SYSTEM_PROMPT + "每次对话后都要生成恋爱结果，标题为{用户名}的恋爱报告，内容为建议列表")
                 .user(message)
-                .advisors(advisorSpec -> advisorSpec.param(ChatMemory.CONVERSATION_ID,conversationId)) //设置拦截器参数
+                .advisors(advisorSpec -> advisorSpec.param(ChatMemory.CONVERSATION_ID, conversationId)) //设置拦截器参数
                 .call()
                 .entity(LoveReport.class);
 
@@ -125,7 +119,7 @@ public class LoveApp {
                 .prompt()
 //                .user(message) //原始用户输入提示词
                 .user(rewriteMessage)//使用改写后的提示词
-                .advisors(advisorSpec -> advisorSpec.param(ChatMemory.CONVERSATION_ID,conversationId)) //设置拦截器参数
+                .advisors(advisorSpec -> advisorSpec.param(ChatMemory.CONVERSATION_ID, conversationId)) //设置拦截器参数
                 .advisors(new MyLoggerAdvisor())
 
                 .advisors(QuestionAnswerAdvisor.builder(loveAppVectorStore).build()) //QuestionAnswerAdvisor比较适用于单个测试 RetrievalAugmentationAdvisor适用于批量
@@ -147,6 +141,7 @@ public class LoveApp {
 
     /**
      * AI调用工具功能
+     *
      * @param message
      * @param conversationId
      * @return
@@ -155,7 +150,7 @@ public class LoveApp {
         ChatResponse chatResponse = chatClient
                 .prompt()
                 .user(message)
-                .advisors(advisorSpec -> advisorSpec.param(ChatMemory.CONVERSATION_ID,conversationId)) //设置拦截器参数
+                .advisors(advisorSpec -> advisorSpec.param(ChatMemory.CONVERSATION_ID, conversationId)) //设置拦截器参数
                 .advisors(new MyLoggerAdvisor()) //开启日志  便于观察效果
                 .toolCallbacks(allTools)
                 .call()
@@ -164,5 +159,36 @@ public class LoveApp {
         log.info("content: {}", content);
         return content;
     }
+    //AI 调用 MCP 服务
+//    //  MCP 工具提供者（由 spring-ai-starter-mcp-client 自动注册）
+//    @Resource
+//    private FunctionToolCallback functionToolCallback;
+//    @Resource
+//    private SyncMcpToolCallbackProvider syncMcpToolCallbackProvider;
+    @Resource
+    private ToolCallbackProvider toolCallbackProvider;
 
+    /**
+     * AI调用工具功能 (使用MCP）
+     *
+     * @param message
+     * @param conversationId
+     * @return
+     */
+    public String doChatWithMcp(String message, String conversationId) {
+
+        ChatResponse chatResponse = chatClient
+                .prompt()
+                .user(message)
+                .advisors(advisorSpec -> advisorSpec.param(ChatMemory.CONVERSATION_ID, conversationId))
+                .advisors(new MyLoggerAdvisor())
+                .toolCallbacks(toolCallbackProvider) // 传入可执行的 ToolCallback 数组
+                .call()
+                .chatResponse();
+
+        String content = chatResponse.getResult().getOutput().getText();
+        log.info(" MCP 回复内容: {}", content);
+        return content;
+
+    }
 }
