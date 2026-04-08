@@ -1,7 +1,7 @@
 {
   "mcpServers": {
     "amap-maps": {
-      "command": "npx.cmd",
+      "command": "D:\\Program Files\\node\\nodejs\\npx.cmd",
       "args": [
         "-y",
         "@amap/amap-maps-mcp-server"

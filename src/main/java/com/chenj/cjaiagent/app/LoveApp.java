@@ -12,6 +12,7 @@ import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.model.function.FunctionCallback;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.ai.vectorstore.VectorStore;
@@ -168,6 +169,7 @@ public class LoveApp {
     @Resource
     private ToolCallbackProvider toolCallbackProvider;
 
+
     /**
      * AI调用工具功能 (使用MCP）
      *
@@ -182,7 +184,7 @@ public class LoveApp {
                 .user(message)
                 .advisors(advisorSpec -> advisorSpec.param(ChatMemory.CONVERSATION_ID, conversationId))
                 .advisors(new MyLoggerAdvisor())
-                .toolCallbacks(toolCallbackProvider) // 传入可执行的 ToolCallback 数组
+                //.toolCallbacks(mcpToolCallbacks) // 传入可执行的 ToolCallback 数组
                 .call()
                 .chatResponse();
 
