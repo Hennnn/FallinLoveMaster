@@ -47,7 +47,7 @@ public class ToolCallAgent extends ReActAgent{
         this.toolCallingManager = ToolCallingManager.builder().build();
         //自主维护控制工具调用的上下过程与结果，禁用了springAI 内置的工具调用机制（托管给springAi)
         this.chatOptions = DashScopeChatOptions.builder()
-                .internalToolExecutionEnabled(false)
+                .withInternalToolExecutionEnabled(false)
                 .build();
     }
 

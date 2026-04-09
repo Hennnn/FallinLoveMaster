@@ -14,9 +14,9 @@ class CjManusTest {
     @Test
     public void run(){
         String userPrompt = """  
-                我的另一半居住在上海静安区，请帮我搜索一些适合约会的地点，  
-                并且直接下载一张适合做手机壁纸的星空情侣图片为文件，  
-                并生成一份‘七夕约会计划’PDF，包含餐厅预订、活动流程和礼物清单""";
+                我的另一半居住在上海静安区，请帮我找到 5 公里内合适的约会地点，  
+                并结合一些网络图片，制定一份详细的约会计划，  
+                并以 PDF 格式输出""";
         String answer = cjManus.run(userPrompt);
         Assertions.assertNotNull(answer);
     }

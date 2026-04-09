@@ -78,15 +78,18 @@ class LoveAppTest {
     @Test
     void doChatWithMcp(){
         String conversationId = UUID.randomUUID().toString();
-        // 💡 Prompt 必须包含明确的“空间/距离/搜索”意图，才能触发 LLM 调用地图工具
-        String message = "我的另一半居住在上海静安区，请调用地图工具帮我查找5公里内评分最高的3家适合情侣约会的咖啡馆，列出名称和具体地址。";
-
-        log.info("📤 发起高德 MCP 测试请求: {}", message);
-        String answer = loveApp.doChatWithMcp(message, conversationId);
-
-        Assertions.assertNotNull(answer, "MCP 调用返回为空");
-        log.info("📥 高德 MCP 响应结果: {}", answer);
-
+//        // 💡 Prompt 必须包含明确的“空间/距离/搜索”意图，才能触发 LLM 调用地图工具
+//        String message = "我的另一半居住在上海静安区，请调用地图工具帮我查找5公里内评分最高的3家适合情侣约会的咖啡馆，列出名称和具体地址。";
+//
+//        log.info("📤 发起高德 MCP 测试请求: {}", message);
+//        String answer = loveApp.doChatWithMcp(message, conversationId);
+//
+//        Assertions.assertNotNull(answer, "MCP 调用返回为空");
+//        log.info("📥 高德 MCP 响应结果: {}", answer);
+        // 测试图片搜索 MCP
+        String message = "帮我搜索一些哄另一半开心的图片";
+        String answer =  loveApp.doChatWithMcp(message, conversationId);
+        Assertions.assertNotNull(answer);
 
     }
 

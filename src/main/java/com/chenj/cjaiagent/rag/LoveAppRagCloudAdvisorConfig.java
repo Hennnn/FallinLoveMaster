@@ -25,32 +25,46 @@ public class LoveAppRagCloudAdvisorConfig {
     @Value("${spring.ai.dashscope.chat.rag.index-name}")
     private String knowledgeBaseName;
 
+//    @Bean
+//    public Advisor loveAppRagCloudAdvisor() {
+//
+//        try {
+//            // 使用 Builder 模式创建 DashScopeApi，而不是手动 new 构造函数
+//            DashScopeApi dashScopeApi = DashScopeApi.builder()
+//                    .apiKey(dashscopeApiKey) // 设置 API Key
+//                    // 如果需要在Header 传递 WorkspaceId，可以在这里添加 .workspaceId(...)
+//                    .build();
+//            DashScopeDocumentRetrieverOptions options = DashScopeDocumentRetrieverOptions.builder()
+//                    .indexName(knowledgeBaseName) // 必须是云端存在的名字
+//                    .denseSimilarityTopK(3)      // 返回 Top3 文档
+//                    .enableRewrite(true)         // 开启查询重写
+//                    .enableReranking(true)       // 开启重排序
+//                    .build();
+//
+//            DocumentRetriever documentRetriever = new DashScopeDocumentRetriever(dashScopeApi, options);
+//
+//            log.info("已初始化基于百炼知识库 ({}) 的 RAG 顾问", knowledgeBaseName);
+//
+//            return RetrievalAugmentationAdvisor.builder() //还可以设置查询前用 文档重写器 .queryTransformers(RewriteQueryTransformer.builder()
+//                    .documentRetriever(documentRetriever) //查询过程中用 文档加载器
+//                    .build();
+//        } catch (Exception e) {
+//            log.error("初始化百炼 RAG 顾问失败", e);
+//            throw new RuntimeException("RAG 顾问初始化异常", e);
+//        }
+//    }
     @Bean
     public Advisor loveAppRagCloudAdvisor() {
-
-        try {
-            // 使用 Builder 模式创建 DashScopeApi，而不是手动 new 构造函数
-            DashScopeApi dashScopeApi = DashScopeApi.builder()
-                    .apiKey(dashscopeApiKey) // 设置 API Key
-                    // 如果需要在Header 传递 WorkspaceId，可以在这里添加 .workspaceId(...)
-                    .build();
-            DashScopeDocumentRetrieverOptions options = DashScopeDocumentRetrieverOptions.builder()
-                    .indexName(knowledgeBaseName) // 必须是云端存在的名字
-                    .denseSimilarityTopK(3)      // 返回 Top3 文档
-                    .enableRewrite(true)         // 开启查询重写
-                    .enableReranking(true)       // 开启重排序
-                    .build();
-
-            DocumentRetriever documentRetriever = new DashScopeDocumentRetriever(dashScopeApi, options);
-
-            log.info("已初始化基于百炼知识库 ({}) 的 RAG 顾问", knowledgeBaseName);
-
-            return RetrievalAugmentationAdvisor.builder() //还可以设置查询前用 文档重写器 .queryTransformers(RewriteQueryTransformer.builder()
-                    .documentRetriever(documentRetriever) //查询过程中用 文档加载器
-                    .build();
-        } catch (Exception e) {
-            log.error("初始化百炼 RAG 顾问失败", e);
-            throw new RuntimeException("RAG 顾问初始化异常", e);
-        }
+        DashScopeApi dashScopeApi = DashScopeApi.builder()
+                .apiKey(dashscopeApiKey)
+                .build();
+        final String KNOWLEDGE_INDEX = "恋爱大师";
+        DocumentRetriever dashScopeDocumentRetriever = new DashScopeDocumentRetriever(dashScopeApi,
+                DashScopeDocumentRetrieverOptions.builder()
+                    .withIndexName(KNOWLEDGE_INDEX)
+                    .build());
+        return RetrievalAugmentationAdvisor.builder()
+                .documentRetriever(dashScopeDocumentRetriever)
+                .build();
     }
 }

@@ -12,12 +12,12 @@ import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
-import org.springframework.ai.model.function.FunctionCallback;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.stereotype.Component;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
+import reactor.core.publisher.Flux;
 
 
 import java.util.List;
@@ -184,7 +184,7 @@ public class LoveApp {
                 .user(message)
                 .advisors(advisorSpec -> advisorSpec.param(ChatMemory.CONVERSATION_ID, conversationId))
                 .advisors(new MyLoggerAdvisor())
-                //.toolCallbacks(mcpToolCallbacks) // 传入可执行的 ToolCallback 数组
+                .toolCallbacks(toolCallbackProvider) // 传入可执行的 ToolCallback 数组
                 .call()
                 .chatResponse();
 
@@ -192,5 +192,25 @@ public class LoveApp {
         log.info(" MCP 回复内容: {}", content);
         return content;
 
+    }
+
+    /**
+     * AI 基础对话（支持多轮对话记忆）
+     *
+     * @param message        用户消息
+     * @param conversationId 会话ID（用于区分不同用户的对话）
+     * @return AI 回复内容
+     */
+    public Flux<String> doChatByStream(String message, String conversationId) {
+        Flux<String> content = chatClient
+                .prompt()
+                .user(message)
+                .advisors(advisorSpec -> advisorSpec.param(ChatMemory.CONVERSATION_ID, conversationId)) //设置拦截器参数
+                .stream()
+//                .entity(User.class)
+//                .chatResponse().getResult().getOutput().getText() 等价于下一行 也可以用.entity()来指定输出的格式如上一行所示
+                .content();
+        log.info("AI 回复内容: {}", content);
+        return content;
     }
 }
